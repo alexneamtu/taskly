@@ -1,0 +1,27 @@
+{
+  "name": "taskly",
+  "version": "1.0.0",
+  "description": "Task Demo Project",
+  "main": "app.ts",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexneamtu/taskly.git"
+  },
+  "keywords": [
+    "task",
+    "koa",
+    "rest"
+  ],
+  "author": "Alex Neamtu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexneamtu/taskly/issues"
+  },
+  "homepage": "https://github.com/alexneamtu/taskly#readme",
+  "dependencies": {
+    "typescript": "^3.7.5"
+  }
+}
