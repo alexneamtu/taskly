@@ -4,14 +4,15 @@
   "description": "Task Demo Project",
   "main": "app.ts",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "start": "node node_modules/ts-node/dist/bin.js --ignore false app.ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alexneamtu/taskly.git"
   },
   "keywords": [
-    "task",
+    "taskly",
     "koa",
     "rest"
   ],
@@ -22,6 +23,30 @@
   },
   "homepage": "https://github.com/alexneamtu/taskly#readme",
   "dependencies": {
-    "typescript": "^3.7.5"
+    "@types/koa": "^2.11.0",
+    "@types/koa-router": "^7.4.0",
+    "@types/lodash": "^4.14.149",
+    "@types/mkdirp": "^1.0.0",
+    "@types/node": "^13.7.0",
+    "@types/winston": "^2.4.4",
+    "chalk": "^3.0.0",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-jwt": "^3.6.0",
+    "koa-mount": "^4.0.0",
+    "koa-router": "^8.0.7",
+    "koa-validate": "^1.0.7",
+    "lodash": "^4.17.15",
+    "mkdirp": "^1.0.3",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.19.1",
+    "@typescript-eslint/parser": "^2.19.1",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1"
   }
 }
