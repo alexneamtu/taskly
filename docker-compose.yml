@@ -7,8 +7,6 @@ services:
     restart: on-failure
     depends_on:
       - db
-#    environment:
-#
     ports:
       - 8080:8080
 

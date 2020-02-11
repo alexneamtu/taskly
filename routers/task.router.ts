@@ -10,7 +10,7 @@ import { ErrorCode } from '../enums';
 import { config } from '../config';
 
 // controllers
-import { CreateTask } from '../controllers/task.controller';
+import TaskController from '../controllers/task.controller';
 
 const jwtConfig = config.web.jwt;
 
@@ -23,10 +23,51 @@ export class TaskRouter extends KoaRouter {
 
     this.use(TaskRouter.checkAuthorization);
 
-    this.post('/create', async (ctx) => {
+    this.post('/', async (ctx) => {
       try {
         const payload = (ctx.request as any).body;
-        const task = await CreateTask(payload);
+        const task = await TaskController.CreateTask(payload);
+        ctx.status = 201;
+        ctx.body = task;
+      } catch (err) {
+        ctx.throw(400, err.message, { code: ErrorCode.InvalidArguments });
+      }
+    });
+
+    this.get('/', async (ctx) => {
+      try {
+        const result = await TaskController.ListTasks(ctx.query);
+        ctx.status = 200;
+        ctx.body = result;
+      } catch (err) {
+        ctx.throw(400, err.message, { code: ErrorCode.InvalidArguments });
+      }
+    });
+
+    this.get('/:id', async (ctx) => {
+      try {
+        const task = await TaskController.GetTask(ctx.params.id);
+        ctx.status = 200;
+        ctx.body = task;
+      } catch (err) {
+        ctx.throw(400, err.message, { code: ErrorCode.InvalidArguments });
+      }
+    });
+
+    this.patch('/:id', async (ctx) => {
+      try {
+        const payload = (ctx.request as any).body;
+        const task = await TaskController.UpdateTask(ctx.params.id, payload);
+        ctx.status = 200;
+        ctx.body = task;
+      } catch (err) {
+        ctx.throw(400, err.message, { code: ErrorCode.InvalidArguments });
+      }
+    });
+
+    this.delete('/:id', async (ctx) => {
+      try {
+        const task = await TaskController.DeleteTask(ctx.params.id);
         ctx.status = 200;
         ctx.body = task;
       } catch (err) {

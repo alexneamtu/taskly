@@ -4,6 +4,8 @@
   "description": "Task Demo Project",
   "main": "app.ts",
   "scripts": {
+    "lint": "gulp lint",
+    "compile": "gulp compile",
     "test": "gulp test",
     "start": "node node_modules/ts-node/dist/bin.js --ignore false app.ts"
   },
@@ -36,7 +38,6 @@
     "koa-router": "^8.0.7",
     "koa-validate": "^1.0.7",
     "lodash": "^4.17.15",
-    "md5": "^2.2.1",
     "mkdirp": "^1.0.3",
     "moment": "^2.24.0",
     "mongoose": "^5.8.11",

@@ -2,7 +2,7 @@
 import * as KoaRouter from 'koa-router';
 
 // controllers
-import { CreateUser, LoginUser } from '../controllers/user.controller';
+import UserController from '../controllers/user.controller';
 
 // enums
 import { ErrorCode } from '../enums';
@@ -14,10 +14,10 @@ export class UserRouter extends KoaRouter {
   constructor() {
     super();
 
-    this.post('/create', async (ctx) => {
+    this.post('/', async (ctx) => {
       try {
         const payload = (ctx.request as any).body;
-        const user = await CreateUser(payload);
+        const user = await UserController.CreateUser(payload);
         ctx.status = 200;
         ctx.body = user;
       } catch (err) {
@@ -28,7 +28,7 @@ export class UserRouter extends KoaRouter {
     this.post('/login', async (ctx) => {
       try {
         const payload = (ctx.request as any).body;
-        const user = await LoginUser(payload);
+        const user = await UserController.LoginUser(payload);
         ctx.status = 200;
         ctx.body = user;
       } catch (err) {

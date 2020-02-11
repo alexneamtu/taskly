@@ -8,6 +8,8 @@ import { config } from './config';
 // services
 import { LogService as log } from './services/log.service';
 
+jest.setTimeout(30000);
+
 if (config.logs.toFile) {
   const _describe = (global as any).describe;
   const _it = (global as any).it;

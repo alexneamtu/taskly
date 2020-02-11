@@ -9,8 +9,6 @@ import User, { IUser } from '../models/user.model';
 // app
 import { config } from '../config';
 
-const jwtConfig = config.web.jwt;
-
 interface ICreateUserInput {
   email: IUser['email'];
   password: IUser['password'];
@@ -24,41 +22,49 @@ export interface IUserCredentials {
   refreshToken: string;
 }
 
-function encryptPassword(password: string) {
-  const salt = bcrypt.genSaltSync(10);
-  return bcrypt.hashSync(password, salt);
-}
+export default class UserController {
+  public static async CreateUser({ email, password, name }: ICreateUserInput): Promise<IUser> {
+    const encodedPassword = UserController.encryptPassword(password);
+    return User.create({ email, password: encodedPassword, name }).then((data: IUser) => data);
+  }
 
-export async function CreateUser({ email, password, name }: ICreateUserInput): Promise<IUser> {
-  const encodedPassword = encryptPassword(password);
-  return User.create({ email, password: encodedPassword, name }).then((data: IUser) => data);
-}
+  public static async LoginUser({ email, password }: ICreateUserInput): Promise<IUserCredentials> {
+    const user = await User.findOne({ email }).then((data: IUser) => data);
 
-export async function LoginUser({ email, password }: ICreateUserInput): Promise<IUserCredentials> {
-  const user = await User.findOne({ email }).then((data: IUser) => data);
+    const match = bcrypt.compareSync(password, user.password);
 
-  const match = bcrypt.compareSync(password, user.password);
+    if (!match) return null;
 
-  if (!match) return null;
+    return this.createCredentials(user);
+  }
 
-  const accessTokenPayload = {
-    userId: user._id,
-    iss: jwtConfig.issuer,
-    exp: timestamp.now(jwtConfig.accessTokenExpiration),
-    aud: jwtConfig.audience,
-  };
+  private static jwtConfig = config.web.jwt;
 
-  const refreshTokenPayload = {
-    userId: user._id,
-    iss: jwtConfig.issuer,
-    exp: timestamp.now(jwtConfig.refreshTokenExpiration),
-    aud: jwtConfig.audience,
-  };
+  private static createCredentials(user) {
+    const accessTokenPayload = {
+      userId: user.id,
+      iss: UserController.jwtConfig.issuer,
+      exp: timestamp.now(UserController.jwtConfig.accessTokenExpiration),
+      aud: UserController.jwtConfig.audience,
+    };
 
-  return {
-    user,
-    userId: user._id,
-    accessToken: jwt.encode(accessTokenPayload, jwtConfig.secret),
-    refreshToken: jwt.encode(refreshTokenPayload, jwtConfig.secret),
-  };
+    const refreshTokenPayload = {
+      userId: user.id,
+      iss: UserController.jwtConfig.issuer,
+      exp: timestamp.now(UserController.jwtConfig.refreshTokenExpiration),
+      aud: UserController.jwtConfig.audience,
+    };
+
+    return {
+      user,
+      userId: user.id,
+      accessToken: jwt.encode(accessTokenPayload, UserController.jwtConfig.secret),
+      refreshToken: jwt.encode(refreshTokenPayload, UserController.jwtConfig.secret),
+    };
+  }
+
+  private static encryptPassword(password: string) {
+    const salt = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(password, salt);
+  }
 }

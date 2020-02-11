@@ -56,6 +56,7 @@ export class WebService {
         data: null,
         errors: [err],
       };
+      ctx.headers['Content-Type'] = 'application/json';
       ctx.app.emit('error', err, ctx);
     }
   }

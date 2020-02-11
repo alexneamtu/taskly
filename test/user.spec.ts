@@ -16,7 +16,7 @@ describe('user', () => {
     await lib.tearDown();
   });
 
-  it('should be created', async () => {
+  it('should create user', async () => {
     const userData = {
       email: 'test@test.com',
       password: 'Some-password',
@@ -29,7 +29,7 @@ describe('user', () => {
     assert.equal(user.name, userData.name);
   });
 
-  it('should login after creation', async () => {
+  it('should login user', async () => {
     const userData = {
       email: 'test1@test.com',
       password: 'Some-password',
