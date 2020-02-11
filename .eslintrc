@@ -1,7 +1,8 @@
 {
     "env": {
         "es6": true,
-        "node": true
+        "node": true,
+        "jest": true
     },
     "extends": [
         "airbnb-base"
@@ -31,11 +32,13 @@
         }
     },
     "rules": {
-        "indent": ["error", 4],
+        "indent": ["error", 2],
         "import/prefer-default-export": "off",
         "import/extensions": "off",
         "import/no-extraneous-dependencies": "off",
         "object-curly-newline": "off",
-        "no-unused-vars": "off"
+        "no-unused-vars": "off",
+        "no-underscore-dangle": "off",
+        "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }]
     }
 }

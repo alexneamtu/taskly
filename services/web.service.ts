@@ -10,38 +10,53 @@ import * as _ from 'lodash';
 import { LogService as log } from './log.service';
 
 export interface IWebServerConfig {
-    web: {
-        port: number;
-    };
+  web: {
+    port: number;
+  };
 }
 
 export class WebService {
-    public readonly app: Koa;
+  public readonly app: Koa;
 
-    public server;
+  public server;
 
-    constructor(private config: IWebServerConfig, routers: KoaRouter[]) {
-        const app = new Koa();
+  constructor(private config: IWebServerConfig, routers: KoaRouter[]) {
+    const app = new Koa();
 
-        app.use(bodyParser({ extendTypes: { json: ['text/plain'] } }));
+    app.use(bodyParser({ extendTypes: { json: ['text/plain'] } }));
 
-        validate(app);
+    validate(app);
 
-        // Mount all routers
-        routers.forEach((router) => {
-            const service = new Koa();
-            service.use(router.routes());
-            service.use(router.allowedMethods());
+    app.use(WebService.errorHandler);
 
-            app.use(mount(`/${_.replace(router.constructor.name.toLowerCase(), 'router', '')}`, service));
-        });
+    // Mount all routers
+    routers.forEach((router) => {
+      const service = new Koa();
+      service.use(router.routes());
+      service.use(router.allowedMethods());
 
-        this.app = app;
+      app.use(mount(`/${_.replace(router.constructor.name.toLowerCase(), 'router', '')}`, service));
+    });
+
+    this.app = app;
+  }
+
+  public async listen() {
+    this.server = this.app.listen(this.config.web.port, () => {
+      log.info(`Listening on port ${this.config.web.port}...`);
+    });
+  }
+
+  private static async errorHandler(ctx, next) {
+    try {
+      await next();
+    } catch (err) {
+      ctx.status = err.status || 200;
+      ctx.body = {
+        data: null,
+        errors: [err],
+      };
+      ctx.app.emit('error', err, ctx);
     }
-
-    public async listen() {
-        this.server = this.app.listen(this.config.web.port, () => {
-            log.info(`Listening on port ${this.config.web.port}...`);
-        });
-    }
+  }
 }
