@@ -111,3 +111,7 @@ dist
 
 # ignore local configs
 config/*.ts
+
+
+# Mongo
+data
