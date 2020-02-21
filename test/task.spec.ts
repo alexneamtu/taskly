@@ -18,7 +18,7 @@ describe('task', () => {
     await lib.setup();
 
     const userData = {
-      email: 'test@test.com',
+      email: `test${TestLib.randomString()}@test.com`,
       password: 'Some-password',
       name: 'Test Test',
     };
@@ -96,7 +96,7 @@ describe('task', () => {
   });
 
   it('should list tasks', async () => {
-    await Task.remove({});
+    await Task.deleteMany({});
     const taskData = {
       title: 'Title',
       description: 'Description',

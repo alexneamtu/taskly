@@ -26,7 +26,7 @@ export class TaskRouter extends KoaRouter {
     this.post('/', async (ctx) => {
       try {
         const payload = (ctx.request as any).body;
-        const task = await TaskController.CreateTask(payload);
+        const task = await TaskController.CreateTask(ctx, payload);
         ctx.status = 201;
         ctx.body = task;
       } catch (err) {
@@ -36,7 +36,7 @@ export class TaskRouter extends KoaRouter {
 
     this.get('/', async (ctx) => {
       try {
-        const result = await TaskController.ListTasks(ctx.query);
+        const result = await TaskController.ListTasks(ctx);
         ctx.status = 200;
         ctx.body = result;
       } catch (err) {
@@ -46,7 +46,7 @@ export class TaskRouter extends KoaRouter {
 
     this.get('/:id', async (ctx) => {
       try {
-        const task = await TaskController.GetTask(ctx.params.id);
+        const task = await TaskController.GetTask(ctx);
         ctx.status = 200;
         ctx.body = task;
       } catch (err) {
@@ -57,7 +57,7 @@ export class TaskRouter extends KoaRouter {
     this.patch('/:id', async (ctx) => {
       try {
         const payload = (ctx.request as any).body;
-        const task = await TaskController.UpdateTask(ctx.params.id, payload);
+        const task = await TaskController.UpdateTask(ctx, payload);
         ctx.status = 200;
         ctx.body = task;
       } catch (err) {
@@ -67,7 +67,7 @@ export class TaskRouter extends KoaRouter {
 
     this.delete('/:id', async (ctx) => {
       try {
-        const task = await TaskController.DeleteTask(ctx.params.id);
+        const task = await TaskController.DeleteTask(ctx);
         ctx.status = 200;
         ctx.body = task;
       } catch (err) {

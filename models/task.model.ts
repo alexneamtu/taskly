@@ -8,6 +8,7 @@ export interface ITask extends Document {
   description: string;
   deadline: Date;
   reminder: Date;
+  createdBy: string;
   completed: boolean;
 }
 
@@ -17,6 +18,7 @@ const TaskSchema: Schema = new Schema({
   deadline: { type: Date, required: false },
   reminder: { type: Date, required: false },
   completed: { type: Boolean, default: false },
+  createdBy: { type: String, required: true },
 });
 
 // Export the model and return your ITask interface

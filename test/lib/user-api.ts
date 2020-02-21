@@ -2,15 +2,14 @@
 import { BaseApi } from './base-api';
 
 // types
-import { IUser } from '../../models/user.model';
-import { IUserCredentials } from '../../controllers/user.controller';
+import { ICreateUserInput, ICreateUserResponse, IUserCredentials } from '../../controllers/user.controller';
 
 export class UserApi extends BaseApi {
-  public async create(user): Promise<IUser> {
+  public async create(user: ICreateUserInput): Promise<ICreateUserResponse> {
     return this.doPost(['user'], user);
   }
 
-  public async login(email, password): Promise<IUserCredentials> {
+  public async login(email: string, password: string): Promise<IUserCredentials> {
     return this.doPost(['user', 'login'], { email, password });
   }
 }

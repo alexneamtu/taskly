@@ -16,33 +16,34 @@ describe('user', () => {
     await lib.tearDown();
   });
 
-  it('should create user', async () => {
+  it('should create and login user', async () => {
     const userData = {
-      email: 'test@test.com',
+      email: `test${TestLib.randomString()}@test.com`,
       password: 'Some-password',
       name: 'Test Test',
     };
 
-    const user = await lib.user.create(userData);
-    assert.ok(user);
-    assert.equal(user.email, userData.email);
-    assert.equal(user.name, userData.name);
-  });
-
-  it('should login user', async () => {
-    const userData = {
-      email: 'test1@test.com',
-      password: 'Some-password',
-      name: 'Test Test',
-    };
-
-    const user = await lib.user.create(userData);
-    assert.ok(user);
+    const created = await lib.user.create(userData);
+    assert.ok(created);
+    assert.ok(created.message, 'Please check your email for confirmation.');
 
     const credentials = await lib.user.login(userData.email, userData.password);
     assert.ok(credentials);
-    assert.equal(credentials.userId, user._id);
     assert.ok(credentials.accessToken);
     assert.ok(credentials.refreshToken);
+  });
+
+  it('shouldn\'t login with bad credentials', async () => {
+    const userData = {
+      email: `test${TestLib.randomString()}@test.com`,
+      password: 'Some-password',
+      name: 'Test Test',
+    };
+
+    const user = await lib.user.create(userData);
+    assert.ok(user);
+
+    await expect(lib.user.login(userData.email, 'xxx'))
+      .rejects.toEqual(new Error('Error executing query: User/password mismatch.'));
   });
 });

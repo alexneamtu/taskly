@@ -1,3 +1,7 @@
+// npm
+import * as _ from 'lodash';
+import { RouterContext } from 'koa-router';
+
 // models
 import Task, { ITask } from '../models/task.model';
 import { IListOptions } from '../test/lib/base-api';
@@ -35,23 +39,27 @@ export interface IPageInfo {
 }
 
 export default class TaskController {
-  public static async CreateTask(taskInput: ICreateTaskInput): Promise<ITask> {
-    return Task.create(taskInput).then((data: ITask) => data);
+  public static async CreateTask(ctx: RouterContext, taskInput: ICreateTaskInput): Promise<ITask> {
+    _.merge(taskInput, { createdBy: ctx.state.userId });
+    return Task.create(taskInput);
   }
 
-  public static async GetTask(id: string): Promise<ITask> {
-    return Task.findById(id).then((data: ITask) => data);
+  public static async GetTask(ctx: RouterContext): Promise<ITask> {
+    const id = _.get(ctx, 'params.id');
+    return Task.findById(id);
   }
 
-  public static async ListTasks({ limit = 0, skip = 50 }: IListOptions): Promise<IListResult> {
+  public static async ListTasks(ctx: RouterContext): Promise<IListResult> {
+    const userId = _.get(ctx, 'state.userId');
+    const { limit = 0, skip = 50 }: IListOptions = ctx.query;
+
     const totalCount = await Task.find().countDocuments();
 
     const tasks = await Task
-      .find()
+      .find({ createdBy: userId })
       .sort({ _id: 1 })
       .skip(+(skip > 50 ? 50 : skip))
-      .limit(+limit)
-      .then((data: ITask[]) => data);
+      .limit(+limit);
 
     const result = tasks.map((data, index) => ({
       data,
@@ -69,14 +77,29 @@ export default class TaskController {
     };
   }
 
-  public static async UpdateTask(id: string, taskInput: IUpdateTaskInput): Promise<ITask> {
-    const task = await Task.findById(id).then((data: ITask) => data);
+  public static async UpdateTask(ctx: RouterContext, taskInput: IUpdateTaskInput): Promise<ITask> {
+    const id = _.get(ctx, 'params.id');
+    const userId = _.get(ctx, 'state.userId');
+
+    const task = await Task.findById(id);
+
+    if (task.createdBy !== userId) {
+      throw new Error('Not authorized');
+    }
+
     Object.assign(task, taskInput);
     await task.save();
     return task;
   }
 
-  public static async DeleteTask(id: string): Promise<boolean> {
-    return Task.deleteOne({ id }).then((result) => !!result.ok);
+  public static async DeleteTask(ctx: RouterContext): Promise<boolean> {
+    const id = _.get(ctx, 'params.id');
+    const userId = _.get(ctx, 'state.userId');
+    const task = await Task.findById({ id });
+    if (task.createdBy !== userId) {
+      throw new Error('Not authorized');
+    }
+    const result = await Task.deleteOne({ id });
+    return !!result.ok;
   }
 }

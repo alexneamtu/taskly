@@ -9,10 +9,17 @@ import User, { IUser } from '../models/user.model';
 // app
 import { config } from '../config';
 
-interface ICreateUserInput {
+// services
+import { LogService as log } from '../services/log.service';
+
+export interface ICreateUserInput {
   email: IUser['email'];
   password: IUser['password'];
   name: IUser['name'];
+}
+
+export interface ICreateUserResponse {
+  message: string;
 }
 
 export interface IUserCredentials {
@@ -23,19 +30,30 @@ export interface IUserCredentials {
 }
 
 export default class UserController {
-  public static async CreateUser({ email, password, name }: ICreateUserInput): Promise<IUser> {
+  public static async CreateUser({ email, password, name }: ICreateUserInput):
+    Promise<ICreateUserResponse> {
     const encodedPassword = UserController.encryptPassword(password);
-    return User.create({ email, password: encodedPassword, name }).then((data: IUser) => data);
+    const user = await User.findOne({ email });
+    if (user) {
+      log.error(`User with the ${email} email already exists`);
+    } else {
+      await User.create({ email, password: encodedPassword, name }).then((data: IUser) => data);
+    }
+    return { message: 'Please check your email for confirmation.' };
   }
 
   public static async LoginUser({ email, password }: ICreateUserInput): Promise<IUserCredentials> {
-    const user = await User.findOne({ email }).then((data: IUser) => data);
+    const user = await User.findOne({ email });
 
-    const match = bcrypt.compareSync(password, user.password);
+    if (user) {
+      const match = bcrypt.compareSync(password, user.password);
 
-    if (!match) return null;
+      if (!match) throw new Error('User/password mismatch.');
 
-    return this.createCredentials(user);
+      return this.createCredentials(user);
+    }
+
+    throw new Error('User/password mismatch.');
   }
 
   private static jwtConfig = config.web.jwt;

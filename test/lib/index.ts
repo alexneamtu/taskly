@@ -47,4 +47,8 @@ export class TestLib {
   public async tearDown() {
     await this.db.close();
   }
+
+  public static randomString() {
+    return Math.random().toString(36).substring(7);
+  }
 }
